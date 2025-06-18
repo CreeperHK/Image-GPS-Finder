@@ -1,6 +1,6 @@
 import os
 
-def image_recognition_ollama(file_path):
+def image_recognition_ollama(file_path: str):
     try:
         os.system('ollama list> nul')
         import ollama
@@ -17,18 +17,26 @@ def image_recognition_ollama(file_path):
         Please only return in the format: 
         1. If you can identify the location, return True, latitude, longitude.
         2. If you cannot identify the location, return False, 0, 0.
+        3. Also come with a short description of the place.
+
+        The final output should be in the format:
+        True/False, latitude, longitude, description.
+        Please do not return any other information.
         """,
         images=[image_bytes]
     )
-    #print(response['response'])
+    print(response['response'])
 
     result = response['response'].strip().split('\n')[0]
-    is_place, latitude, longitude = result.split(',', 3)
-    is_place = str(is_place.strip())
-    latitude = float(latitude.strip())
-    longitude = float(longitude.strip())
 
-    return is_place, latitude, longitude
+    response_parts = result.split(", ")
+    
+    is_place = True if response_parts[0] == "True" else False
+    latitude = float(response_parts[1])
+    longitude = float(response_parts[2])
+    description = ", ".join(response_parts[3:])
+
+    return is_place, latitude, longitude, description
     
 
 if __name__ == "__main__":

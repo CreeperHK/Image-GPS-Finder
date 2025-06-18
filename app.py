@@ -47,6 +47,9 @@ def cleanup():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    lat_deg = None
+    lon_deg = None
+
     if request.method == 'POST':
         if 'file' not in request.files:
             return redirect(request.url)
@@ -62,20 +65,23 @@ def index():
             file.save(file_path)
 
             try:
-                lat_deg, lon_deg= get_gps_from_exif(file_path)
+                lat_deg, lon_deg = get_gps_from_exif(file_path)
             except Exception as e:
-                is_place, result_lat_deg, result_lon_deg = image_recognition_ollama(file_path)
+                is_place, result_lat_deg, result_lon_deg, description = image_recognition_ollama(file_path)
 
-                if is_place == 'True':
-                    return render_template('result.html', lat_deg=result_lat_deg, lon_deg=result_lon_deg, result='AI RECOGNITION',file_path=file_path)
+                if is_place == True:
+                    return render_template('result.html', lat_deg=result_lat_deg, lon_deg=result_lon_deg, result='AI RECOGNITION',file_path=file_path, description=description)
                 
-                elif is_place == 'False' or result_lat_deg == 0 or result_lon_deg == 0:
+                elif is_place == False or result_lat_deg == 0 or result_lon_deg == 0:
                     return render_template('index.html', error="Unable to determine location from image.")
+                else:
+                    return render_template('index.html', error="AI recognition failed to determine location.")
             
 
             if lat_deg is not None and lon_deg is not None:
                 return render_template('result.html', lat_deg=lat_deg, lon_deg=lon_deg, result='EXIF DATA',file_path=file_path)
-            
+            else:
+                return render_template('index.html', error="No location data found.")
 
         else:
             return render_template('index.html', error="Invalid file type.")

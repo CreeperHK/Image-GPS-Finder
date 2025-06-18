@@ -74,6 +74,10 @@
         <div class="result">
             Latitude: {{ lat_deg }}<br>
             Longitude: {{ lon_deg }}<br>
+            {% if description %}
+            description: {{ description }}
+            {% endif %} 
+        </div>
 
         <a href="/">Back to Upload</a>
     </div>
