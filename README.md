@@ -95,8 +95,9 @@ def image_recognize_gps(image_file_path):
     is_place = bool(result.is_place)  #Does the location be found? False if not found
     latitude = float(result.latitude)  #The GPS latitude, 0 if not found
     longitude = float(result.longitude) #The GPS longitude, 0 if not found
+    description = str(result.description) #The description for user checking, None if not found
 
-    return is_place, latitude, longitude
+    return is_place, latitude, longitude, description
 ```
 ---
 
