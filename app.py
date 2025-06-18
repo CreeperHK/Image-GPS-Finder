@@ -1,0 +1,94 @@
+import atexit
+import glob
+from flask import Flask, render_template, request, redirect, url_for
+import exifread
+import time
+import os
+
+from ollama_api import image_recognition_ollama
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'uploads/'
+app.secret_key = 'exif'
+
+# Allowed file extensions
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'raw', '.webp'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def get_gps_from_exif(image_path):
+    try:
+        with open(image_path, 'rb') as f:
+            tags = exifread.process_file(f)
+            if 'GPS GPSLatitude' in tags and 'GPS GPSLongitude' in tags:
+                lat = tags['GPS GPSLatitude'].values
+                lon = tags['GPS GPSLongitude'].values
+                lat_deg = lat[0].num / lat[0].den
+                lat_min = lat[1].num / lat[1].den
+                lat_sec = lat[2].num / lat[2].den
+                lon_deg = lon[0].num / lon[0].den
+                lon_min = lon[1].num / lon[1].den
+                lon_sec = lon[2].num / lon[2].den
+                lat_deg = lat_deg + lat_min / 60 + lat_sec / 3600
+                lon_deg = lon_deg + lon_min / 60 + lon_sec / 3600
+                return lat_deg, lon_deg
+            else:
+                return None
+    except Exception as e:
+        return None
+
+def cleanup():
+    files = glob.glob('uploads/*')
+    for f in files:
+        if f == r'static\style.css' or f == r'static\\style.css' or not os.path.isfile(f):
+            continue
+        os.remove(f)
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return redirect(request.url)
+        
+        file = request.files['file']
+
+        if file.filename == '':
+            return redirect(request.url)
+        
+        if file and allowed_file(file.filename):
+            filename = file.filename
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+
+            try:
+                lat_deg, lon_deg= get_gps_from_exif(file_path)
+            except Exception as e:
+                is_place, result_lat_deg, result_lon_deg = image_recognition_ollama(file_path)
+
+                if is_place == 'True':
+                    return render_template('result.html', lat_deg=result_lat_deg, lon_deg=result_lon_deg, result='AI RECOGNITION',file_path=file_path)
+                
+                elif is_place == 'False' or result_lat_deg == 0 or result_lon_deg == 0:
+                    return render_template('index.html', error="Unable to determine location from image.")
+            
+
+            if lat_deg is not None and lon_deg is not None:
+                return render_template('result.html', lat_deg=lat_deg, lon_deg=lon_deg, result='EXIF DATA',file_path=file_path)
+            
+
+        else:
+            return render_template('index.html', error="Invalid file type.")
+    
+    elif request.method == 'GET':
+        return render_template('index.html')
+    
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
+    time.sleep(1)
+    atexit.register(cleanup)
+    os.system('taskkill /f /im ollama* > nul')
+    os.removedirs(app.config['UPLOAD_FOLDER'])

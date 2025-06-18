@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Image GPS Finder</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 80%;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .result {
+            font-size: 18px;
+            color: #007BFF;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .map-container {
+            width: 100%;
+            height: 400px; /* You can increase this */
+            margin-top: 20px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .error {
+            color: red;
+            text-align: center;
+            margin-top: 20px;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #007BFF;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if result %}
+        <h2>Result: {{ result }}</h2>
+        {% endif %}
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% else %}
+            <div class="map-container">
+                <iframe 
+                    src="https://maps.google.com/maps?q={{ lat_deg }},{{ lon_deg }}&hl=en&z=14&output=embed"
+                    style="width:100%; height:100%; border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                ></iframe>
+            </div>
+        {% endif %}
+        <div class="result">
+            Latitude: {{ lat_deg }}<br>
+            Longitude: {{ lon_deg }}<br>
+
+        <a href="/">Back to Upload</a>
+    </div>
+</body>
+</html>
