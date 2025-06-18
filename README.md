@@ -82,12 +82,6 @@ The app will start on `http://127.0.0.1:5000`.
 
 ---
 
-## 📄 License
-
-This project is for personal use only. See the [LICENSE](LICENSE) file for details.
-
----
-
 ## ✏️ Customize
 
 If you want to use another model or use API. You only need to edit the `ollama_api.py`.
