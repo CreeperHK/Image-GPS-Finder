@@ -69,18 +69,28 @@ def index():
             except Exception as e:
                 is_place, result_lat_deg, result_lon_deg, description = image_recognition_ollama(file_path)
 
-                if is_place == True:
-                    return render_template('result.html', lat_deg=result_lat_deg, lon_deg=result_lon_deg, result='AI RECOGNITION',file_path=file_path, description=description)
+                if is_place:
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+                    return render_template('result.html', lat_deg=result_lat_deg, lon_deg=result_lon_deg, result='AI RECOGNITION', file_path=file_path, description=description)
                 
                 elif is_place == False or result_lat_deg == 0 or result_lon_deg == 0:
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
                     return render_template('index.html', error="Unable to determine location from image.")
                 else:
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
                     return render_template('index.html', error="AI recognition failed to determine location.")
             
-
+            # If EXIF data found
             if lat_deg is not None and lon_deg is not None:
-                return render_template('result.html', lat_deg=lat_deg, lon_deg=lon_deg, result='EXIF DATA',file_path=file_path)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                return render_template('result.html', lat_deg=lat_deg, lon_deg=lon_deg, result='EXIF DATA', file_path=file_path)
             else:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
                 return render_template('index.html', error="No location data found.")
 
         else:
