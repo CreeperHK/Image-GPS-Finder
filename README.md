@@ -1,3 +1,5 @@
+---
+
 # Image GPS Finder with EXIF and AI Recognition
 
 A Flask web application that extracts GPS coordinates from image EXIF data or uses AI to recognize locations. Displays results on a map.
@@ -6,7 +8,7 @@ A Flask web application that extracts GPS coordinates from image EXIF data or us
 
 ## 📌 Description
 
-This application allows users to upload images and retrieve their geographic coordinates. It first checks for GPS data in the image's EXIF metadata. If unavailable, it uses a AI model to analyze the image and estimate the location(In this project we use Ollama for local LLM model, see [Ollama](https://ollama.com/) for more detail). The result is displayed on a map with latitude and longitude.
+This application allows users to upload images and retrieve their geographic coordinates. It first checks for GPS data in the image's EXIF metadata. If unavailable, it uses a AI model to analyze the image and estimate the location (In this project we use Ollama for local LLM model, see [Ollama](https://ollama.com/) for more detail). The result is displayed on a map with latitude and longitude.
 
 ---
 
@@ -23,7 +25,7 @@ pip install -r requirements.txt
 ```
 
 ### 3. **Install Ollama Model**
-Ensure the Ollama model `gemma3:12b-it-qat`(Or your LLM model) is pulled:
+Ensure the Ollama model `gemma3:12b-it-qat` (Or your LLM model) is pulled:
 ```bash
 ollama pull <Model_Name>
 ```
@@ -67,6 +69,7 @@ The app will start on `http://127.0.0.1:5000`.
 ├── app.py                  # Main Flask application
 ├── ollama_api.py           # AI image recognition logic
 ├── requirements.txt        # Python dependencies
+├── LICENSE                 # License for this application
 ├── uploads/                # Uploaded image storage (auto-created)
 └── templates/
     ├── index.html          # Upload form
@@ -79,26 +82,27 @@ The app will start on `http://127.0.0.1:5000`.
 
 - **Ollama Process Cleanup**: The script attempts to terminate Ollama processes on exit, but this may not always work reliably.
 - **File Cleanup**: The `uploads/` directory is cleaned up automatically, but manual deletion may be needed in some cases.
-
+- **Description Showing**: The description will only show up when the image runs on AI recognition, if the image is run on exif data, it won't show the description.
 ---
 
 ## ✏️ Customize
 
-If you want to use another model or use API. You only need to edit the `ollama_api.py`.
-the logic inside the code should be look like this:
+If you want to use another model or use API. You only need to edit the `ollama_api.py`.  
+The logic inside the code should look like this:
 ```python
 def image_recognize_gps(image_file_path):
 
     # Your model or API request logic, the model/API should answer 3 things as follow.
     # Please edit the prompt to ensure 3 things return.
 
-    is_place = bool(result.is_place)  #Does the location be found? False if not found
-    latitude = float(result.latitude)  #The GPS latitude, 0 if not found
-    longitude = float(result.longitude) #The GPS longitude, 0 if not found
-    description = str(result.description) #The description for user checking, None if not found
+    is_place = bool(result.is_place)  # Does the location be found? False if not found
+    latitude = float(result.latitude)  # The GPS latitude, 0 if not found
+    longitude = float(result.longitude) # The GPS longitude, 0 if not found
+    description = str(result.description) # The description for user checking, None if not found
 
     return is_place, latitude, longitude, description
 ```
+
 ---
 
 ## 📚 Credits
@@ -107,3 +111,11 @@ def image_recognize_gps(image_file_path):
 - **AI Backend**: [Ollama](https://ollama.com/)
 - **AI Model**: [Gemma3](https://deepmind.google/models/gemma/)
 - **Flask Framework**: [Flask](https://flask.palletsprojects.com/)
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+
+---
