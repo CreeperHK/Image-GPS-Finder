@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for
 import exifread
 import time
 import os
+from typing import Tuple
 
 from ollama_api import image_recognition_ollama
 
@@ -14,10 +15,10 @@ app.secret_key = 'exif'
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'raw', '.webp'}
 
-def allowed_file(filename):
+def allowed_file(filename: str) -> bool:
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def get_gps_from_exif(image_path):
+def get_gps_from_exif(image_path: str) -> Tuple[float, float]:
     try:
         with open(image_path, 'rb') as f:
             tags = exifread.process_file(f)
@@ -66,6 +67,8 @@ def index():
 
             try:
                 lat_deg, lon_deg = get_gps_from_exif(file_path)
+
+            # If EXIF data not found, use AI recognition
             except Exception as e:
                 is_place, result_lat_deg, result_lon_deg, description = image_recognition_ollama(file_path)
 

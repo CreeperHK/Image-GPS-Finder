@@ -1,6 +1,7 @@
 import os
+from typing import Tuple
 
-def image_recognition_ollama(file_path: str):
+def image_recognition_ollama(file_path: str) -> Tuple[bool, float, float, str]:
     try:
         os.system('ollama list> nul')
         import ollama
