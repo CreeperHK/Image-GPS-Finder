@@ -125,6 +125,7 @@ If you want to use other model which is already install in Ollama, You only need
     <option value="qwen2.5vl">qwen2.5vl</option>
     <option value="gemma3:12b-it-qat">gemma3:12b</option>
     <option value="{Your Model Name}">{Your Model Name}</option>
+    <!-- Please make sure the model name is correct while calling API or Ollama -->
 </select></p>
 ```
 

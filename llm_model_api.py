@@ -15,7 +15,7 @@ def image_recognition_ollama(file_path: str, model: str) -> Tuple[bool, float, f
     with open(file_path, "rb") as f:
         image_bytes = f.read()
     response = ollama.generate(
-        model="gemma3:12b-it-qat",
+        model=model,
         prompt="""
         Where is this image taken? Please provide the GPS coordinates in the format of latitude and longitude. 
         Please only return in the format: 
