@@ -118,6 +118,16 @@ def image_recognize_gps(image_file_path, model):
     return is_place, latitude, longitude, description
 ```
 
+If you want to use other model which is already install in Ollama, You only need to edit the `index.html`
+```html
+<!-- line 81 -->
+<select name="model" id="modelSelect">
+    <option value="qwen2.5vl">qwen2.5vl</option>
+    <option value="gemma3:12b-it-qat">gemma3:12b</option>
+    <option value="{Your Model Name}">{Your Model Name}</option>
+</select></p>
+```
+
 ---
 
 ## 📚 Credits
