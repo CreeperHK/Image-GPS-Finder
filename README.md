@@ -15,9 +15,9 @@ This application allows users to upload images and retrieve their geographic coo
 ## 🛠 Installation
 
 ### 1. **Prerequisites**
-- Python 3.x
+- Python >3.7 (Dev in 3.12.10)
 - [Ollama](https://ollama.com/)
-- A Local LLM model which support Image as input (Using gemma3:12b-it-qat in this case)
+- A Local LLM model which support Image as input
 
 ### 2. **Install Dependencies**
 ```bash
@@ -25,9 +25,9 @@ pip install -r requirements.txt
 ```
 
 ### 3. **Install Ollama Model**
-Ensure the Ollama model `gemma3:12b-it-qat` (Or your LLM model) is pulled:
+Ensure the Ollama model is pulled: (Using qwen2.5vl as example)
 ```bash
-ollama pull <Model_Name>
+ollama pull qwen2.5vl
 ```
 
 ---
@@ -67,10 +67,11 @@ The app will start on `http://127.0.0.1:5000`.
 ```
 /your-project-folder/
 ├── app.py                  # Main Flask application
-├── ollama_api.py           # AI image recognition logic
+├── llm_model_api.py        # AI image recognition logic
+├── llm_model_install_check # Use to check is Ollama and the model running
 ├── requirements.txt        # Python dependencies
 ├── LICENSE                 # License for this application
-├── uploads/                # Uploaded image storage (auto-created)
+├── uploads/                # Uploaded image storage (auto-created and delete after use)
 └── templates/
     ├── index.html          # Upload form
     └── result.html         # Result display
@@ -83,17 +84,31 @@ The app will start on `http://127.0.0.1:5000`.
 - **Ollama Process Cleanup**: The script attempts to terminate Ollama processes on exit, but this may not always work reliably.
 - **File Cleanup**: The `uploads/` directory is cleaned up automatically, but manual deletion may be needed in some cases.
 - **Description Showing**: The description will only show up when the image runs on AI recognition, if the image is run on exif data, it won't show the description.
+- **Accuracy on Map**: the pointer on the map is based on the GPS coordinate provided by the LLM model. After many tests, the pointer can only indicate the vicinity of the target location but not the exact location.
 ---
 
 ## ✏️ Customize
 
-If you want to use another model or use API. You only need to edit the `ollama_api.py`.  
+If you want to use another model or use API. You only need to edit the `llm_model_api.py`.  
 The logic inside the code should look like this:
 ```python
-def image_recognize_gps(image_file_path):
+def image_recognize_gps(image_file_path, model):
 
-    # Your model or API request logic, the model/API should answer 3 things as follow.
-    # Please edit the prompt to ensure 3 things return.
+    # Your model or API request logic, the model/API should answer 4 things as follow.
+    # Please edit the prompt to ensure 4 things return.
+
+    # Recommend for using this prompt
+    prompt="""
+        Where is this image taken? Please provide the GPS coordinates in the format of latitude and longitude. 
+        Please only return in the format: 
+        1. If you can identify the location, return True, latitude, longitude.
+        2. If you cannot identify the location, return False, 0, 0.
+        3. Also come with a short description of the place.
+
+        The final output should be in the format:
+        True/False, latitude, longitude, description.
+        Please do not return any other information.
+        """
 
     is_place = bool(result.is_place)  # Does the location be found? False if not found
     latitude = float(result.latitude)  # The GPS latitude, 0 if not found
