@@ -33,6 +33,13 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+        select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: white;
+        }
         button {
             padding: 10px;
             background-color: #4CAF50;
@@ -70,8 +77,16 @@
         <form method="post" enctype="multipart/form-data">
             <input type="file" name="file" id="imageUpload" required>
 
+            <p>If it need to use AI recognition, Please select the model you want to use.
+            <select name="model" id="modelSelect">
+                <option value="qwen2.5vl">qwen2.5vl</option>
+                <option value="gemma3:12b-it-qat">gemma3:12b</option>
+            </select></p>
+            
+
             <button type="submit">Upload and Find GPS</button>
             <div class="preview" id="imagePreview"></div>
+            
         </form>
     </div>
 
